@@ -37,6 +37,7 @@ export default function DataTable(props: {
 	page: number;
 	limit: number;
 	total: number;
+
 	params: Record<string, any>;
 	setParams: (updater: any) => void;
 }) {

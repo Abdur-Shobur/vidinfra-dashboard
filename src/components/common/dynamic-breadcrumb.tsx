@@ -28,7 +28,6 @@ export function DynamicBreadcrumb({ items, className }: BreadcrumbProps) {
 			<BreadcrumbList>
 				{items.map((item, index) => {
 					const isLast = index === items.length - 1;
-					const isFirst = index === 0;
 
 					return (
 						<React.Fragment key={index}>

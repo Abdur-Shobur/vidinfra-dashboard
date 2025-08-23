@@ -29,6 +29,10 @@ A modern, responsive admin dashboard for managing CDN distributions built with N
 - **Icons**: Lucide React
 - **Date Handling**: date-fns
 
+## Live Link
+
+[https://vidinfra-dashboard.vercel.app/distributions](https://vidinfra-dashboard.vercel.app/distributions)
+
 ## Installation
 
 1. Clone the repository:
