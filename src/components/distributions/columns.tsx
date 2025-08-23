@@ -1,49 +1,67 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
-import type { Distribution } from '@/types/cdn';
 import { Badge } from '@/components/ui/badge';
 import { formatDate, formatTime } from '@/lib/format';
-import { CheckCircle, XCircle, AlertCircle, Clock } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { Distribution } from '@/types/cdn';
+import { ColumnDef } from '@tanstack/react-table';
+import { CircleAlert, CircleCheck, CircleX, Hourglass } from 'lucide-react';
 
 const statusConfig: Record<
-	Distribution['status'],
+	string,
 	{
-		variant: string;
 		icon: React.ComponentType<{ className?: string }>;
 		label: string;
+		className?: string;
 	}
 > = {
+	provisioning: {
+		icon: Hourglass,
+		label: 'Provisioning',
+		className: 'text-success-300',
+	},
 	active: {
-		variant: 'bg-green-100 text-green-700 border-green-200',
-		icon: CheckCircle,
+		icon: CircleCheck,
 		label: 'Active',
+		className: 'text-success-300',
 	},
 	inactive: {
-		variant: 'bg-red-100 text-red-700 border-red-200',
-		icon: XCircle,
+		icon: CircleAlert,
 		label: 'Inactive',
+		className: 'text-warning-300',
 	},
-	pending: {
-		variant: 'bg-blue-100 text-blue-700 border-blue-200',
-		icon: Clock,
-		label: 'Provisioning',
+
+	disabled: {
+		icon: CircleX,
+		label: 'Suspended',
+		className: 'text-error-300',
 	},
 };
 
 export const columns: ColumnDef<Distribution>[] = [
 	{
-		accessorKey: 'label',
+		accessorKey: 'name',
 		header: 'Label',
 		cell: ({ getValue }) => (
-			<span className="font-medium text-gray-900">{String(getValue())}</span>
+			<span className="font-medium text-gray-900 dark:text-gray-300">
+				{String(getValue())}
+			</span>
 		),
 	},
 	{
 		accessorKey: 'cname',
+		header: 'CNAME',
+		cell: ({ getValue }) => (
+			<span className="text-gray-600 dark:text-gray-300 font-mono text-sm">
+				{String(getValue())}
+			</span>
+		),
+	},
+	{
+		accessorKey: 'domain',
 		header: 'Domain',
 		cell: ({ getValue }) => (
-			<span className="text-gray-600 font-mono text-sm">
+			<span className="text-gray-600 dark:text-gray-300 font-mono text-sm">
 				{String(getValue())}
 			</span>
 		),
@@ -52,30 +70,46 @@ export const columns: ColumnDef<Distribution>[] = [
 		accessorKey: 'status',
 		header: 'Status',
 		cell: ({ getValue }) => {
-			const status = String(getValue()) as Distribution['status'];
-			const config = statusConfig[status];
+			const status = String(getValue());
+			const config = statusConfig[status] || statusConfig.inactive;
 			const Icon = config.icon;
 
 			return (
 				<div className="flex items-center gap-2">
-					<Icon className="h-4 w-4" />
-					<Badge className={`${config.variant} border`}>{config.label}</Badge>
+					<Badge variant="outline" className={'capitalize'}>
+						<Icon className={cn('h-4 w-4', config.className)} />
+						{config.label}
+					</Badge>
 				</div>
 			);
 		},
 	},
 	{
 		accessorKey: 'created_at',
+		id: 'date_modified',
 		header: 'Date Modified',
-		cell: ({ getValue }) => (
-			<span className="text-gray-600">{formatDate(String(getValue()))}</span>
-		),
+		cell: ({ getValue }) => {
+			const dateValue = String(getValue());
+			const formattedDate = formatDate(dateValue);
+			return (
+				<span className="text-gray-600 dark:text-gray-300">
+					{formattedDate}
+				</span>
+			);
+		},
 	},
 	{
 		accessorKey: 'created_at',
+		id: 'time',
 		header: 'Time',
-		cell: ({ getValue }) => (
-			<span className="text-gray-600">{formatTime(String(getValue()))}</span>
-		),
+		cell: ({ getValue }) => {
+			const dateValue = String(getValue());
+			const formattedTime = formatTime(dateValue);
+			return (
+				<span className="text-gray-600 dark:text-gray-300">
+					{formattedTime}
+				</span>
+			);
+		},
 	},
 ];

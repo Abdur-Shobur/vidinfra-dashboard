@@ -2,21 +2,21 @@
 
 A modern, responsive admin dashboard for managing CDN distributions built with Next.js 15, TypeScript, and shadcn/ui.
 
-## 🚀 Features
+## Features
 
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
 - **Data Table**: Sortable, filterable, and paginated distributions table
 - **Advanced Filtering**:
-  - CNAME/Domain search with debounced input
-  - Status filter (Active, Inactive, Pending)
+  - CNAME search with debounced input
+  - Status filter (Active, suspend, Provisioning)
   - Date range picker for creation dates
-  - Priority and sorting options
 - **Real-time Updates**: URL state management with nuqs
 - **Modern UI**: Clean, professional design matching the Figma specifications
 - **Type Safety**: Full TypeScript implementation
-- **Error Handling**: Graceful error states and loading indicators
+- **Error Handling**: states and loading indicators
+- **Theme**: Dark and Light theme change
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
@@ -29,12 +29,12 @@ A modern, responsive admin dashboard for managing CDN distributions built with N
 - **Icons**: Lucide React
 - **Date Handling**: date-fns
 
-## 📦 Installation
+## Installation
 
 1. Clone the repository:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Abdur-Shobur/vidinfra-dashboard.git
 cd vidinfra-dashboard
 ```
 
@@ -47,8 +47,7 @@ npm install
 3. Set up environment variables (optional):
 
 ```bash
-# Create .env.local file
-NEXT_PUBLIC_API_BASE_URL=https://api.vidinfra.com/cdn
+NEXT_PUBLIC_API_BASE_URL=https://api-staging.tenbyte.io/cdn
 ```
 
 4. Run the development server:
@@ -57,141 +56,17 @@ NEXT_PUBLIC_API_BASE_URL=https://api.vidinfra.com/cdn
 npm run dev
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+5. Build and run
 
-## 🏗 Project Structure
-
-```
-src/
-├── app/
-│   ├── (dashboard)/
-│   │   ├── layout.tsx          # Dashboard layout with sidebar
-│   │   └── distributions/
-│   │       ├── page.tsx        # Server component wrapper
-│   │       ├── page.client.tsx # Client component with logic
-│   │       ├── loading.tsx     # Loading state
-│   │       └── error.tsx       # Error boundary
-│   ├── layout.tsx              # Root layout
-│   └── page.tsx                # Home page (redirects to distributions)
-├── components/
-│   ├── distributions/
-│   │   ├── data-table.tsx      # Main data table component
-│   │   ├── columns.tsx         # Table column definitions
-│   │   └── toolbar.tsx         # Filter and search toolbar
-│   └── ui/                     # shadcn/ui components
-├── lib/
-│   ├── axios.ts                # HTTP client configuration
-│   ├── distributions.ts        # API functions and mock data
-│   ├── format.ts               # Date/time formatting utilities
-│   └── url.ts                  # URL state management
-├── providers/
-│   └── app-provider.tsx        # React Query provider
-└── types/
-    └── cdn.ts                  # TypeScript type definitions
+```bash
+npm run build
+npm run start
 ```
 
-## 🎨 Design Implementation
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-The dashboard follows the provided Figma design with:
+7. For to typescript check
 
-- **Sidebar Navigation**: Clean navigation with icons and active states
-- **Header Section**: Breadcrumbs, title, and action buttons
-- **Filter Toolbar**: Search bar and filter buttons with dropdowns
-- **Data Table**: Professional table with status badges, sorting, and actions
-- **Pagination**: Full pagination controls with page navigation
-
-### Status Badges
-
-- **Active**: Green with checkmark icon
-- **Inactive**: Red with X icon
-- **Pending**: Blue with clock icon (labeled as "Provisioning")
-
-## 🔧 Configuration
-
-### API Configuration
-
-The dashboard can work with or without a real API:
-
-- **With API**: Set `NEXT_PUBLIC_API_BASE_URL` environment variable
-- **Without API**: Uses built-in mock data for testing
-
-### Mock Data
-
-The application includes realistic mock data for testing:
-
-- 10 sample distributions with various statuses
-- Realistic domain names and labels
-- Proper date formatting
-
-## 📱 Responsive Design
-
-The dashboard is fully responsive:
-
-- **Desktop**: Full sidebar and table layout
-- **Tablet**: Collapsible sidebar and optimized table
-- **Mobile**: Stacked layout with mobile-friendly controls
-
-## 🚀 Deployment
-
-### Vercel (Recommended)
-
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Deploy automatically
-
-### Other Platforms
-
-The application can be deployed to any platform that supports Next.js:
-
-- Netlify
-- Railway
-- DigitalOcean App Platform
-- AWS Amplify
-
-## 🧪 Testing
-
-The application includes:
-
-- TypeScript type checking
-- Mock data for testing without API
-- Error boundaries for graceful error handling
-- Loading states for better UX
-
-## 📄 API Documentation
-
-### Endpoints
-
-- `GET /v1/distributions` - Fetch distributions with filtering and pagination
-
-### Query Parameters
-
-- `page` - Page number (default: 1)
-- `limit` - Items per page (default: 10)
-- `filter[cname][like]` - Search by CNAME/domain
-- `filter[status][eq]` - Filter by status
-- `filter[created_at][between]` - Date range filter
-- `sort` - Sort field with direction (e.g., "-created_at")
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 🆘 Support
-
-If you encounter any issues or have questions:
-
-1. Check the documentation
-2. Review existing issues
-3. Create a new issue with detailed information
-
----
-
-Built with ❤️ for Vidinfra CDN Management
+```
+npm run type-check
+```

@@ -1,14 +1,5 @@
 'use client';
 
-import * as React from 'react';
-import {
-	useReactTable,
-	getCoreRowModel,
-	getSortedRowModel,
-	SortingState,
-} from '@tanstack/react-table';
-import { columns } from './columns';
-import type { Distribution } from '@/types/cdn';
 import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,
@@ -16,20 +7,28 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Pagination } from '@/components/ui/pagination';
+import type { Distribution } from '@/types/cdn';
 import {
-	ChevronUp,
-	ChevronDown,
-	MoreHorizontal,
-	ChevronsLeft,
-	ChevronLeft,
-	ChevronRight,
-	ChevronsRight,
+	flexRender,
+	getCoreRowModel,
+	getSortedRowModel,
+	SortingState,
+	useReactTable,
+} from '@tanstack/react-table';
+import {
 	BarChart3,
-	Shield,
-	Settings,
+	ChevronDown,
+	ChevronUp,
+	EllipsisVertical,
+	MoreHorizontal,
 	RotateCcw,
+	Settings,
+	Shield,
 	Trash2,
 } from 'lucide-react';
+import * as React from 'react';
+import { columns } from './columns';
 
 export default function DataTable(props: {
 	loading: boolean;
@@ -41,9 +40,13 @@ export default function DataTable(props: {
 	params: Record<string, any>;
 	setParams: (updater: any) => void;
 }) {
+	// props
 	const { loading, error, data, page, limit, total, params, setParams } = props;
+
+	// local state for sorting
 	const [sorting, setSorting] = React.useState<SortingState>([]);
 
+	// effect for sorting
 	// map sorting to API sort param
 	React.useEffect(() => {
 		if (!sorting.length) return;
@@ -52,6 +55,7 @@ export default function DataTable(props: {
 		setParams((p: any) => ({ ...p, sort: `${dir}${String(s.id)}` }));
 	}, [sorting, setParams]);
 
+	// table
 	const table = useReactTable({
 		data,
 		columns,
@@ -61,10 +65,14 @@ export default function DataTable(props: {
 		getSortedRowModel: getSortedRowModel(),
 	});
 
-	const pageCount = Math.max(1, Math.ceil(total / limit));
+	// current page
+	const currentPage = page;
+	// total items
+	const totalItems = total;
 
 	return (
 		<div className="space-y-4">
+			{/* error */}
 			{error && (
 				<div
 					role="alert"
@@ -74,16 +82,20 @@ export default function DataTable(props: {
 				</div>
 			)}
 
-			<div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-				<table className="w-full text-sm">
-					<thead className="bg-gray-50 border-b border-gray-200">
+			{/* table */}
+			<div className="bg-card rounded-lg border border-gray-200 dark:border-gray-700 overflow-x-auto">
+				<table className="w-full text-sm ">
+					<thead className="bg-card border-b border-gray-200 dark:border-gray-700">
 						{table.getHeaderGroups().map((hg) => (
 							<tr key={hg.id}>
+								{/* headers */}
 								{hg.headers.map((h) => (
 									<th
 										key={h.id}
-										className="px-6 py-4 text-left font-medium text-gray-700 cursor-pointer select-none hover:bg-gray-100 transition-colors"
+										className="px-2 md:px-6 whitespace-nowrap py-2 md:py-4 text-left font-medium text-gray-700 dark:text-gray-300 cursor-pointer select-none hover:bg-gray-100 dark:hover:bg-stone-800 transition-colors"
+										// sort handler
 										onClick={h.column.getToggleSortingHandler()}
+										// aria-sort
 										aria-sort={
 											h.column.getIsSorted()
 												? h.column.getIsSorted() === 'desc'
@@ -93,11 +105,14 @@ export default function DataTable(props: {
 										}
 									>
 										<div className="flex items-center gap-2">
+											{/* header content */}
 											{h.isPlaceholder
 												? null
 												: (h.column.columnDef.header as any)}
+											{/* sort handler */}
 											{h.column.getCanSort() && (
 												<div className="flex flex-col">
+													{/* sort icon */}
 													{h.column.getIsSorted() === 'asc' ? (
 														<ChevronUp className="h-3 w-3" />
 													) : h.column.getIsSorted() === 'desc' ? (
@@ -113,59 +128,108 @@ export default function DataTable(props: {
 										</div>
 									</th>
 								))}
-								<th className="px-6 py-4 text-left font-medium text-gray-700">
-									Actions
-								</th>
+								<th></th>
 							</tr>
 						))}
 					</thead>
-					<tbody className="divide-y divide-gray-200">
+					<tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+						{/* loading */}
 						{loading ? (
-							Array.from({ length: 6 }).map((_, i) => (
-								<tr key={i} className="hover:bg-gray-50">
-									<td className="px-6 py-4" colSpan={6}>
-										<div className="h-6 w-full animate-pulse bg-gray-200 rounded" />
+							// loading skeleton
+							Array.from({ length: 10 }).map((_, i) => (
+								<tr
+									key={i}
+									className="hover:bg-gray-50 dark:hover:bg-stone-800"
+								>
+									<td
+										className="px-6 py-4"
+										// colSpan for the table
+										// +1 for the action column
+										colSpan={table.getAllColumns().length + 1}
+									>
+										<div className="h-6 w-full animate-pulse bg-gray-200 dark:bg-gray-700 rounded" />
 									</td>
 								</tr>
 							))
 						) : data.length === 0 ? (
+							// no data
 							<tr>
 								<td
-									className="px-6 py-12 text-center text-gray-500"
-									colSpan={6}
+									className="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
+									// colSpan for the table
+									// +1 for the action column
+									colSpan={table.getAllColumns().length + 1}
 								>
 									<div className="flex flex-col items-center gap-2">
-										<div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-											<MoreHorizontal className="h-6 w-6 text-gray-400" />
+										<div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+											<MoreHorizontal className="h-6 w-6 text-gray-400 dark:text-gray-300" />
 										</div>
 										<p className="text-sm font-medium">
 											No distributions found
 										</p>
-										<p className="text-xs text-gray-400">
+										<p className="text-xs text-gray-400 dark:text-gray-300">
 											Try adjusting your filters
+											{/* reset filters button */}
+											<Button
+												variant="link"
+												size="sm"
+												className="text-blue-500 dark:text-blue-400"
+												onClick={() => {
+													setParams((p: any) => ({
+														...p,
+														page: 1,
+														cname: '',
+														status: '',
+														created_from: '',
+														created_to: '',
+														name: '',
+														domain: '',
+														domain_type: '',
+														cache_strategy: '',
+														enable_ssl: '',
+														is_http2: '',
+														is_http3: '',
+														sort: '',
+													}));
+													setSorting([]);
+												}}
+											>
+												Reset Filters
+											</Button>
 										</p>
 									</div>
 								</td>
 							</tr>
 						) : (
+							// data rows
 							table.getRowModel().rows.map((r) => (
-								<tr key={r.id} className="hover:bg-gray-50 transition-colors">
+								<tr
+									key={r.id}
+									className="hover:bg-gray-50 dark:hover:bg-stone-800 transition-colors"
+								>
+									{/* cells */}
 									{r.getVisibleCells().map((c) => (
-										<td key={c.id} className="px-6 py-4">
-											{c.getValue() as React.ReactNode}
+										<td
+											key={c.id}
+											className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap text-gray-700 dark:text-gray-300	"
+										>
+											{flexRender(c.column.columnDef.cell, c.getContext())}
 										</td>
 									))}
-									<td className="px-6 py-4">
+									{/* action column */}
+									<td className="px-2 md:px-6 py-2 md:py-4">
 										<DropdownMenu>
+											{/* dropdown menu trigger */}
 											<DropdownMenuTrigger asChild>
 												<Button
 													variant="ghost"
 													size="sm"
 													className="h-8 w-8 p-0"
 												>
-													<MoreHorizontal className="h-4 w-4" />
+													<EllipsisVertical className="h-4 w-4" />
 												</Button>
 											</DropdownMenuTrigger>
+											{/* dropdown menu content */}
 											<DropdownMenuContent align="end" className="w-48">
 												<DropdownMenuItem className="flex items-center gap-2">
 													<BarChart3 className="h-4 w-4" />
@@ -198,79 +262,17 @@ export default function DataTable(props: {
 			</div>
 
 			{/* Pagination */}
-			<div className="flex items-center justify-between">
-				<div className="text-sm text-gray-500">
-					0 of {total} row(s) selected.
-				</div>
-				<div className="flex items-center gap-4">
-					<div className="flex items-center gap-2">
-						<span className="text-sm text-gray-500">Rows per page</span>
-						<select
-							aria-label="Rows per page"
-							className="border border-gray-200 rounded px-2 py-1 text-sm bg-white"
-							value={String(limit)}
-							onChange={(e) =>
-								props.setParams((p: any) => ({
-									...p,
-									page: 1,
-									limit: Number(e.target.value),
-								}))
-							}
-						>
-							{[10, 20, 50].map((n) => (
-								<option key={n} value={n}>
-									{n}
-								</option>
-							))}
-						</select>
-					</div>
-					<div className="flex items-center gap-1">
-						<Button
-							variant="outline"
-							size="sm"
-							disabled={page <= 1}
-							onClick={() => setParams((p: any) => ({ ...p, page: 1 }))}
-							className="h-8 w-8 p-0"
-						>
-							<ChevronsLeft className="h-4 w-4" />
-						</Button>
-						<Button
-							variant="outline"
-							size="sm"
-							disabled={page <= 1}
-							onClick={() =>
-								setParams((p: any) => ({ ...p, page: p.page - 1 }))
-							}
-							className="h-8 w-8 p-0"
-						>
-							<ChevronLeft className="h-4 w-4" />
-						</Button>
-						<span className="text-sm text-gray-700 px-2">
-							Page {page} of {pageCount}
-						</span>
-						<Button
-							variant="outline"
-							size="sm"
-							disabled={page >= pageCount}
-							onClick={() =>
-								setParams((p: any) => ({ ...p, page: p.page + 1 }))
-							}
-							className="h-8 w-8 p-0"
-						>
-							<ChevronRight className="h-4 w-4" />
-						</Button>
-						<Button
-							variant="outline"
-							size="sm"
-							disabled={page >= pageCount}
-							onClick={() => setParams((p: any) => ({ ...p, page: pageCount }))}
-							className="h-8 w-8 p-0"
-						>
-							<ChevronsRight className="h-4 w-4" />
-						</Button>
-					</div>
-				</div>
-			</div>
+			<Pagination
+				currentPage={currentPage}
+				totalItems={totalItems}
+				pageSize={limit}
+				pageSizeOptions={[10, 20, 50]}
+				onPageChange={(page) => setParams((p: any) => ({ ...p, page }))}
+				onPageSizeChange={(pageSize) =>
+					setParams((p: any) => ({ ...p, page: 1, limit: pageSize }))
+				}
+				disabled={loading}
+			/>
 		</div>
 	);
 }
