@@ -5,7 +5,8 @@ import DataTable from '@/components/distributions/data-table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SelectSearch } from '@/components/ui/searchable-select';
-import { fetchDistributions } from '@/lib/distributions';
+// import { fetchDistributions } from '@/lib/distributions';
+import { fetchDistributionsDummy } from '@/lib/distributions-dummy';
 import { paramsConfig } from '@/lib/url';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
@@ -136,9 +137,34 @@ export default function DistributionsPage() {
 		return count;
 	};
 
-	/** API CALL
+	/** API CALL - COMMENTED OUT, USING DUMMY DATA
 	 * query for fetching distributions
 	 */
+	// const query = useQuery({
+	// 	queryKey: [
+	// 		'distributions',
+	// 		page,
+	// 		limit,
+	// 		cname,
+	// 		status,
+	// 		created_from,
+	// 		created_to,
+	// 		sort,
+	// 	],
+	// 	queryFn: () =>
+	// 		fetchDistributions({
+	// 			page,
+	// 			limit,
+	// 			cname,
+	// 			status,
+	// 			created_from,
+	// 			created_to,
+	// 			sort,
+	// 		}),
+	// 	staleTime: 30_000,
+	// });
+
+	/** DUMMY DATA - Using dummy data instead of API */
 	const query = useQuery({
 		queryKey: [
 			'distributions',
@@ -151,7 +177,7 @@ export default function DistributionsPage() {
 			sort,
 		],
 		queryFn: () =>
-			fetchDistributions({
+			fetchDistributionsDummy({
 				page,
 				limit,
 				cname,
